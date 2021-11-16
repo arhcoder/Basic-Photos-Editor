@@ -1,11 +1,9 @@
 package pexels;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.logging.*;
 
 // Escrito a prisas por Alejandro Ramos | @arhcoder.
 
@@ -31,26 +29,78 @@ public class Pexels extends javax.swing.JFrame
         }
         catch (Exception FileNotFoundException)
         {
-            JOptionPane.showMessageDialog(this, "¡No se pudo abrir!\nIntente de nuevo...\n" +
+            JOptionPane.showMessageDialog(null, "¡No se pudo abrir!\nIntente de nuevo...\n" +
             FileNotFoundException, "Algo salió mal", JOptionPane.ERROR);
         }
         
         return image;
     }
     
+    public void drawImage(JLabel canvas)
+    {
+        /// Se busca y abre una imagen con el método [openImage].
+        /// Se dibuja la imagen obtenida, dentro del Frame.
+        
+        // Abre un selector de archivos.
+        JFileChooser fileChooser = new JFileChooser();
+        if (fileChooser.showDialog(null, "Seleccione su archivo") == JFileChooser.APPROVE_OPTION)
+        {
+            // Filtra las extensiones de imagen.
+            picture = fileChooser.getSelectedFile();
+            if (picture.canRead())
+            {
+                if
+                (
+                    picture.getName().endsWith("jpg") ||
+                    picture.getName().endsWith("jpeg") ||
+                    picture.getName().endsWith("png") ||
+                    picture.getName().endsWith("bmp")
+                )
+                {
+                    // Abre la imagen seleccionada.
+                    byte[] image = openImage(picture);
+                    canvas.setIcon(new ImageIcon(image));
+
+                    // Guarda la ruta de la imagen.
+                    path = fileChooser.getSelectedFile().toString();
+                    path = picture.getPath();
+
+                    // Se ajusta la imágen al tamaño de la pestaña.
+                    Toolkit tool = Toolkit.getDefaultToolkit();
+                    Image RAMImage = tool.createImage(path);
+                    
+                    // Se escala a lo ancho si la imagen es más ancha que alta //
+                    if(RAMImage.getWidth(this) > RAMImage.getHeight(this))
+                    {
+                        canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(canvas.getWidth(), -1, Image.SCALE_AREA_AVERAGING)));
+                    }
+                    // Se escala a lo alto si la imagene es más alta que ancha, o cuadrada //
+                    else
+                    {
+                        canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(-1, canvas.getHeight(), Image.SCALE_AREA_AVERAGING)));
+                    }
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null, "¡No se pudo guardar!\nIntente de nuevo...\n",
+                    "Algo salió mal", JOptionPane.ERROR);
+                }
+            }
+        }
+    }
+    
     public void saveImage(File file, byte[] image)
     {
         /// Accede a memoria de disco duro y guarda un archivo imagen.
-        
         try
         {
             FileOutputStream outputFile = new FileOutputStream(file);
             outputFile.write(image);
-            JOptionPane.showMessageDialog(this, "Imágen guadada exitosamente");
+            JOptionPane.showMessageDialog(null, "Imágen guadada exitosamente");
         }
         catch (Exception FileNotFoundException)
         {
-            JOptionPane.showMessageDialog(this, "¡No se pudo guardar!\nIntente de nuevo...\n" +
+            JOptionPane.showMessageDialog(null, "¡No se pudo guardar!\nIntente de nuevo...\n" +
             FileNotFoundException, "Algo salió mal", JOptionPane.ERROR);
         }
     }
@@ -58,6 +108,7 @@ public class Pexels extends javax.swing.JFrame
     public Pexels()
     {
         initComponents();
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
     
     @SuppressWarnings("unchecked")
@@ -76,12 +127,16 @@ public class Pexels extends javax.swing.JFrame
         setName("Pexels"); // NOI18N
         setSize(new java.awt.Dimension(1024, 800));
 
+        Picture.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        Picture.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Picture.setAlignmentX(0.5F);
+
         Menu.setMinimumSize(new java.awt.Dimension(56, 100));
 
         Menu_File.setText("Archivo");
 
         Menu_File_Open.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
-        Menu_File_Open.setText("Abrir");
+        Menu_File_Open.setText("Abrir Imagen");
         Menu_File_Open.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Menu_File_OpenActionPerformed(evt);
@@ -90,7 +145,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_File.add(Menu_File_Open);
 
         Menu_File_Save.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        Menu_File_Save.setText("Guardar");
+        Menu_File_Save.setText("Guardar Imagen");
         Menu_File_Save.setEnabled(false);
         Menu_File_Save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -121,44 +176,7 @@ public class Pexels extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void Menu_File_OpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_File_OpenActionPerformed
-        
-        /// Abre un archivo.
-        
-        // Abre un selector de archivos.
-        JFileChooser fileChooser = new JFileChooser();
-        this.picture = fileChooser.getSelectedFile();
-        
-        // Filtra las extensiones de imagen.
-        if (picture.canRead())
-        {
-            if
-            (
-                picture.getName().endsWith("jpg") ||
-                picture.getName().endsWith("jpeg") ||
-                picture.getName().endsWith("png") ||
-                picture.getName().endsWith("bmp")
-            )
-            {
-                // Abre la imagen seleccionada.
-                byte[] image = openImage(picture);
-                Picture.setIcon(new ImageIcon(image));
-                
-                // Guarda la ruta de la imagen.
-                Toolkit tool = Toolkit.getDefaultToolkit();
-                this.path = fileChooser.getSelectedFile().toString();
-                
-                // Se ajusta la imágen al tamaño de la pestaña.
-                Image RAMImage = tool.createImage(path);
-                Picture.setIcon(new ImageIcon(RAMImage.getScaledInstance(Picture.getWidth(), Picture.getHeight(), Image.SCALE_AREA_AVERAGING)));
-
-                this.path = picture.getPath();
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(this, "¡No se pudo guardar!\nIntente de nuevo...\n",
-                "Algo salió mal", JOptionPane.ERROR);
-            }
-        }
+        drawImage(Picture);
     }//GEN-LAST:event_Menu_File_OpenActionPerformed
 
     private void Menu_File_SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_File_SaveActionPerformed
