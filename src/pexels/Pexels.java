@@ -11,8 +11,8 @@ public class Pexels extends javax.swing.JFrame
 {
     // Attributes //
     File picture;
+    byte[] image;
     String path;
-    BufferedImage ramBuffer;
     
     // Methods //
     public byte[] openImage(File file)
@@ -20,12 +20,12 @@ public class Pexels extends javax.swing.JFrame
         /// Accede al disco duro y obtiene un archivo que guarda en una secuencia de bytes.
         /// Regresa la secuencia de bits del archivo.
         
-        byte[] image = new byte[999999];
+        byte[] bytesSequence = new byte[999999];
         
         try
         {
             FileInputStream inputFile = new FileInputStream(file);
-            inputFile.read(image);
+            inputFile.read(bytesSequence);
         }
         catch (Exception FileNotFoundException)
         {
@@ -33,9 +33,8 @@ public class Pexels extends javax.swing.JFrame
             FileNotFoundException, "Algo salió mal", JOptionPane.ERROR);
         }
         
-        return image;
+        return bytesSequence;
     }
-    
     public void drawImage(JLabel canvas)
     {
         /// Se busca y abre una imagen con el método [openImage].
@@ -58,7 +57,7 @@ public class Pexels extends javax.swing.JFrame
                 )
                 {
                     // Abre la imagen seleccionada.
-                    byte[] image = openImage(picture);
+                    image = openImage(picture);
                     canvas.setIcon(new ImageIcon(image));
 
                     // Guarda la ruta de la imagen.
@@ -79,6 +78,9 @@ public class Pexels extends javax.swing.JFrame
                     {
                         canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(-1, canvas.getHeight(), Image.SCALE_AREA_AVERAGING)));
                     }
+                    
+                    // Se habilita la opción de guardar imágen.
+                    Menu_File_Save.setEnabled(true);
                 }
                 else
                 {
@@ -91,7 +93,7 @@ public class Pexels extends javax.swing.JFrame
     
     public void saveImage(File file, byte[] image)
     {
-        /// Accede a memoria de disco duro y guarda un archivo imagen.
+        /// Accede a memoria de disco duro y guarda un archivo imagen en la ruta especificada por el usuario.
         try
         {
             FileOutputStream outputFile = new FileOutputStream(file);
@@ -120,6 +122,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_File = new javax.swing.JMenu();
         Menu_File_Open = new javax.swing.JMenuItem();
         Menu_File_Save = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         Menu_Operators = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -145,7 +148,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_File.add(Menu_File_Open);
 
         Menu_File_Save.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        Menu_File_Save.setText("Guardar Imagen");
+        Menu_File_Save.setText("Guardar");
         Menu_File_Save.setEnabled(false);
         Menu_File_Save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -153,6 +156,10 @@ public class Pexels extends javax.swing.JFrame
             }
         });
         Menu_File.add(Menu_File_Save);
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem1.setText("Guardar como");
+        Menu_File.add(jMenuItem1);
 
         Menu.add(Menu_File);
 
@@ -180,7 +187,7 @@ public class Pexels extends javax.swing.JFrame
     }//GEN-LAST:event_Menu_File_OpenActionPerformed
 
     private void Menu_File_SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_File_SaveActionPerformed
-        
+        saveImage(picture, image);
     }//GEN-LAST:event_Menu_File_SaveActionPerformed
 
     public static void main(String args[])
@@ -221,5 +228,6 @@ public class Pexels extends javax.swing.JFrame
     private javax.swing.JMenuItem Menu_File_Save;
     private javax.swing.JMenu Menu_Operators;
     private javax.swing.JLabel Picture;
+    private javax.swing.JMenuItem jMenuItem1;
     // End of variables declaration//GEN-END:variables
 }
