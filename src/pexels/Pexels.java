@@ -15,6 +15,7 @@ public class Pexels extends javax.swing.JFrame
     String path;
     
     // Methods //
+    // File Loading //
     public byte[] openImage(File file)
     {
         /// Accede al disco duro y obtiene un archivo que guarda en una secuencia de bytes.
@@ -81,6 +82,7 @@ public class Pexels extends javax.swing.JFrame
                     
                     // Se habilita la opción de guardar imágen.
                     Menu_File_Save.setEnabled(true);
+                    Menu_File_SaveAs.setEnabled(true);
                 }
                 else
                 {
@@ -90,22 +92,33 @@ public class Pexels extends javax.swing.JFrame
             }
         }
     }
-    
     public void saveImage(File file, byte[] image)
     {
         /// Accede a memoria de disco duro y guarda un archivo imagen en la ruta especificada por el usuario.
-        try
+        int confirmation = JOptionPane.showConfirmDialog(null, "¿Está seguro?\nSe sobreescribirá su archivo original si continúa...", "¿Desea guardar la imagen?", JOptionPane.YES_NO_OPTION);
+        
+        if (confirmation == JOptionPane.YES_OPTION)
         {
-            FileOutputStream outputFile = new FileOutputStream(file);
-            outputFile.write(image);
-            JOptionPane.showMessageDialog(null, "Imágen guadada exitosamente");
-        }
-        catch (Exception FileNotFoundException)
-        {
-            JOptionPane.showMessageDialog(null, "¡No se pudo guardar!\nIntente de nuevo...\n" +
-            FileNotFoundException, "Algo salió mal", JOptionPane.ERROR);
-        }
+            try
+            {
+                FileOutputStream outputFile = new FileOutputStream(file);
+                outputFile.write(image);
+                JOptionPane.showMessageDialog(null, "Imágen guadada exitosamente");
+            }
+            catch (Exception FileNotFoundException)
+            {
+                JOptionPane.showMessageDialog(null, "¡No se pudo guardar!\nIntente de nuevo...\n" +
+                FileNotFoundException, "Algo salió mal", JOptionPane.ERROR);
+            }
+        }   
     }
+    public void saveImageAs()
+    {
+        
+    }
+    
+    // Image manipulation //
+    
     
     public Pexels()
     {
@@ -122,7 +135,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_File = new javax.swing.JMenu();
         Menu_File_Open = new javax.swing.JMenuItem();
         Menu_File_Save = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        Menu_File_SaveAs = new javax.swing.JMenuItem();
         Menu_Operators = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -157,9 +170,10 @@ public class Pexels extends javax.swing.JFrame
         });
         Menu_File.add(Menu_File_Save);
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem1.setText("Guardar como");
-        Menu_File.add(jMenuItem1);
+        Menu_File_SaveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        Menu_File_SaveAs.setText("Guardar como");
+        Menu_File_SaveAs.setEnabled(false);
+        Menu_File.add(Menu_File_SaveAs);
 
         Menu.add(Menu_File);
 
@@ -226,8 +240,8 @@ public class Pexels extends javax.swing.JFrame
     private javax.swing.JMenu Menu_File;
     private javax.swing.JMenuItem Menu_File_Open;
     private javax.swing.JMenuItem Menu_File_Save;
+    private javax.swing.JMenuItem Menu_File_SaveAs;
     private javax.swing.JMenu Menu_Operators;
     private javax.swing.JLabel Picture;
-    private javax.swing.JMenuItem jMenuItem1;
     // End of variables declaration//GEN-END:variables
 }
