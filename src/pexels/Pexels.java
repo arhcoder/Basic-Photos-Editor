@@ -2,8 +2,8 @@ package pexels;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 // Escrito a prisas por Alejandro Ramos | @arhcoder.
 
@@ -14,6 +14,13 @@ public class Pexels extends javax.swing.JFrame
     byte[] image;
     String path;
     
+    // Filters //
+    FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("Imágen PNG","png");
+    FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter("Imágen JPG","jpg");
+    FileNameExtensionFilter jpegFilter = new FileNameExtensionFilter("Imágen JPEG","jpeg");
+    FileNameExtensionFilter bmpFilter = new FileNameExtensionFilter("Imágen BMP","bmp");
+
+    
     // Methods //
     // File Loading //
     public byte[] openImage(File file)
@@ -21,42 +28,49 @@ public class Pexels extends javax.swing.JFrame
         /// Accede al disco duro y obtiene un archivo que guarda en una secuencia de bytes.
         /// Regresa la secuencia de bits del archivo.
         
-        byte[] bytesSequence = new byte[999999];
-        
         try
         {
             FileInputStream inputFile = new FileInputStream(file);
+            byte[] bytesSequence = new byte[(int)file.length()];
             inputFile.read(bytesSequence);
+            
+            return bytesSequence;
         }
         catch (Exception FileNotFoundException)
         {
             JOptionPane.showMessageDialog(null, "¡No se pudo abrir!\nIntente de nuevo...\n" +
             FileNotFoundException, "Algo salió mal", JOptionPane.ERROR);
+            return null;
         }
-        
-        return bytesSequence;
     }
     public void drawImage(JLabel canvas)
     {
         /// Se busca y abre una imagen con el método [openImage].
         /// Se dibuja la imagen obtenida, dentro del Frame.
         
-        // Abre un selector de archivos.
+        // Abre un selector de archivos con filtro de imágenes.
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.addChoosableFileFilter(pngFilter);
+        fileChooser.addChoosableFileFilter(jpgFilter);
+        fileChooser.addChoosableFileFilter(jpegFilter);
+        fileChooser.addChoosableFileFilter(bmpFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        
         if (fileChooser.showDialog(null, "Seleccione su archivo") == JFileChooser.APPROVE_OPTION)
         {
             // Filtra las extensiones de imagen.
             picture = fileChooser.getSelectedFile();
+            
             if (picture.canRead())
             {
-                if
+                /*if
                 (
-                    picture.getName().endsWith("jpg") ||
-                    picture.getName().endsWith("jpeg") ||
-                    picture.getName().endsWith("png") ||
-                    picture.getName().endsWith("bmp")
-                )
-                {
+                    picture.getName().toLowerCase().endsWith("jpg") ||
+                    picture.getName().toLowerCase().endsWith("jpeg") ||
+                    picture.getName().toLowerCase().endsWith("png") ||
+                    picture.getName().toLowerCase().endsWith("bmp")
+                
+                {*/
                     // Abre la imagen seleccionada.
                     image = openImage(picture);
                     canvas.setIcon(new ImageIcon(image));
@@ -83,12 +97,12 @@ public class Pexels extends javax.swing.JFrame
                     // Se habilita la opción de guardar imágen.
                     Menu_File_Save.setEnabled(true);
                     Menu_File_SaveAs.setEnabled(true);
-                }
+                /*}
                 else
                 {
                     JOptionPane.showMessageDialog(null, "¡No se pudo guardar!\nIntente de nuevo...\n",
                     "Algo salió mal", JOptionPane.ERROR);
-                }
+                }*/
             }
         }
     }
@@ -114,7 +128,49 @@ public class Pexels extends javax.swing.JFrame
     }
     public void saveImageAs()
     {
+        JFileChooser explorer = new JFileChooser();
+        explorer.setCurrentDirectory(new java.io.File("."));
+        explorer.setDialogTitle("Seleccione una ubicación para guardar la imagen");
+        explorer.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        explorer.addChoosableFileFilter(pngFilter);
+        explorer.addChoosableFileFilter(jpgFilter);
+        explorer.addChoosableFileFilter(jpegFilter);
+        explorer.addChoosableFileFilter(bmpFilter);
+        explorer.setAcceptAllFileFilterUsed(false);
+        boolean writePermission = true;
         
+        if (explorer.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+        {
+            // Si se sobreescribirá un archivo //
+           if (explorer.getSelectedFile().exists())
+           {
+               int confirmation = JOptionPane.showConfirmDialog(null, "¿Está seguro?\nSe sobreescribirá su archivo si continúa...", "¿Desea guardar la imagen?", JOptionPane.YES_NO_OPTION);
+               if (confirmation == JOptionPane.NO_OPTION)
+               {
+                   writePermission = false;
+               }
+           }
+           
+           if (writePermission)
+           {
+               try
+                {
+                    // Obtiene la extensión colocada en el filtro del FileChooser.
+                    javax.swing.filechooser.FileFilter currentFilter = explorer.getFileFilter();
+                    String extension = ((FileNameExtensionFilter) currentFilter).getExtensions()[0];
+                    
+                    // Se guarda la imágen.
+                    FileOutputStream outputFile = new FileOutputStream(explorer.getSelectedFile() + "." + extension);
+                    outputFile.write(image);
+                    JOptionPane.showMessageDialog(null, "Imágen guadada exitosamente");
+                }
+                catch (Exception FileNotFoundException)
+                {
+                    JOptionPane.showMessageDialog(null, "¡No se pudo guardar!\nIntente de nuevo...\n" +
+                    FileNotFoundException, "Algo salió mal", JOptionPane.ERROR);
+                }
+           }
+        }
     }
     
     // Image manipulation //
@@ -173,6 +229,11 @@ public class Pexels extends javax.swing.JFrame
         Menu_File_SaveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
         Menu_File_SaveAs.setText("Guardar como");
         Menu_File_SaveAs.setEnabled(false);
+        Menu_File_SaveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_File_SaveAsActionPerformed(evt);
+            }
+        });
         Menu_File.add(Menu_File_SaveAs);
 
         Menu.add(Menu_File);
@@ -203,6 +264,10 @@ public class Pexels extends javax.swing.JFrame
     private void Menu_File_SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_File_SaveActionPerformed
         saveImage(picture, image);
     }//GEN-LAST:event_Menu_File_SaveActionPerformed
+
+    private void Menu_File_SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_File_SaveAsActionPerformed
+        saveImageAs();
+    }//GEN-LAST:event_Menu_File_SaveAsActionPerformed
 
     public static void main(String args[])
     {
@@ -244,4 +309,8 @@ public class Pexels extends javax.swing.JFrame
     private javax.swing.JMenu Menu_Operators;
     private javax.swing.JLabel Picture;
     // End of variables declaration//GEN-END:variables
+
+    private String getExtensionForFilter(javax.swing.filechooser.FileFilter fileFilter) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
