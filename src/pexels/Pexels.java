@@ -5,10 +5,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import static java.lang.Math.pow;
 
 // Escrito a prisas por Alejandro Ramos | @arhcoder.
 
@@ -103,7 +102,8 @@ public class Pexels extends javax.swing.JFrame
                 Menu_Operator_Negative.setEnabled(true);
                 Menu_Operator_BlackNWhite.setEnabled(true);
                 Menu_Operator_Greys.setEnabled(true);
-
+                Menu_Operator_Lighten.setEnabled(true);
+                Menu_Operator_Darken.setEnabled(true);
             }
         }
     }
@@ -295,6 +295,34 @@ public class Pexels extends javax.swing.JFrame
                             r[x][y] = (short) ((r[x][y] + g[x][y] + b[x][y]) / 3);
                             g[x][y] = r[x][y];
                             b[x][y] = r[x][y];
+                        }
+                    }
+                break;
+                
+                // Aclarar //
+                case 3:
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            double r12 = r[x][y], g12 = g[x][y], b12 = b[x][y];
+                            r[x][y] = (short) (255 * (pow(r12, 0.9) / pow(255, 0.9)));
+                            g[x][y] = (short) (255 * (pow(g12, 0.9) / pow(255, 0.9)));
+                            b[x][y] = (short) (255 * (pow(b12, 0.9) / pow(255, 0.9)));
+                        }
+                    }
+                break;
+                
+                // Oscurecer //
+                case 4:
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            double r12 = r[x][y], g12 = g[x][y], b12 = b[x][y];
+                            r[x][y] = (short) (255 * (pow(r12, 1.1) / pow(255, 1.1)));
+                            g[x][y] = (short) (255 * (pow(g12, 1.1) / pow(255, 1.1)));
+                            b[x][y] = (short) (255 * (pow(b12, 1.1) / pow(255, 1.1)));
                         }
                     }
                 break;
@@ -507,11 +535,11 @@ public class Pexels extends javax.swing.JFrame
     }//GEN-LAST:event_Menu_Operator_GreysActionPerformed
 
     private void Menu_Operator_LightenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_LightenActionPerformed
-        // TODO add your handling code here:
+        operateImage(3, Picture);
     }//GEN-LAST:event_Menu_Operator_LightenActionPerformed
 
     private void Menu_Operator_DarkenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_DarkenActionPerformed
-        // TODO add your handling code here:
+        operateImage(4, Picture);
     }//GEN-LAST:event_Menu_Operator_DarkenActionPerformed
 
     public static void main(String args[])
