@@ -356,6 +356,11 @@ public class Pexels extends javax.swing.JFrame
                 canvas.setIcon(new ImageIcon(bufferedImage.getScaledInstance(-1, canvas.getHeight(), Image.SCALE_AREA_AVERAGING)));
             }
             RAMImage = bufferedImage;
+            
+            // Se guarda la imágen de RAM en el atributo [image] de la clase.
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(bufferedImage, "jpg", baos);
+            image = baos.toByteArray();
         }
         catch (Exception colorPrintException)
         {
