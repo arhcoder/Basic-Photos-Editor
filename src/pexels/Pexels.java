@@ -63,46 +63,32 @@ public class Pexels extends javax.swing.JFrame
             
             if (picture.canRead())
             {
-                /*if
-                (
-                    picture.getName().toLowerCase().endsWith("jpg") ||
-                    picture.getName().toLowerCase().endsWith("jpeg") ||
-                    picture.getName().toLowerCase().endsWith("png") ||
-                    picture.getName().toLowerCase().endsWith("bmp")
-                
-                {*/
-                    // Abre la imagen seleccionada.
-                    image = openImage(picture);
-                    canvas.setIcon(new ImageIcon(image));
+                // Abre la imagen seleccionada.
+                image = openImage(picture);
+                canvas.setIcon(new ImageIcon(image));
 
-                    // Guarda la ruta de la imagen.
-                    path = fileChooser.getSelectedFile().toString();
-                    path = picture.getPath();
+                // Guarda la ruta de la imagen.
+                path = fileChooser.getSelectedFile().toString();
+                path = picture.getPath();
 
-                    // Se ajusta la imágen al tamaño de la pestaña.
-                    Toolkit tool = Toolkit.getDefaultToolkit();
-                    Image RAMImage = tool.createImage(path);
-                    
-                    // Se escala a lo ancho si la imagen es más ancha que alta //
-                    if(RAMImage.getWidth(this) > RAMImage.getHeight(this))
-                    {
-                        canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(canvas.getWidth(), -1, Image.SCALE_AREA_AVERAGING)));
-                    }
-                    // Se escala a lo alto si la imagene es más alta que ancha, o cuadrada //
-                    else
-                    {
-                        canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(-1, canvas.getHeight(), Image.SCALE_AREA_AVERAGING)));
-                    }
-                    
-                    // Se habilita la opción de guardar imágen.
-                    Menu_File_Save.setEnabled(true);
-                    Menu_File_SaveAs.setEnabled(true);
-                /*}
+                // Se ajusta la imágen al tamaño de la pestaña.
+                Toolkit tool = Toolkit.getDefaultToolkit();
+                Image RAMImage = tool.createImage(path);
+
+                // Se escala a lo ancho si la imagen es más ancha que alta //
+                if(RAMImage.getWidth(this) > RAMImage.getHeight(this))
+                {
+                    canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(canvas.getWidth(), -1, Image.SCALE_AREA_AVERAGING)));
+                }
+                // Se escala a lo alto si la imagene es más alta que ancha, o cuadrada //
                 else
                 {
-                    JOptionPane.showMessageDialog(null, "¡No se pudo guardar!\nIntente de nuevo...\n",
-                    "Algo salió mal", JOptionPane.ERROR);
-                }*/
+                    canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(-1, canvas.getHeight(), Image.SCALE_AREA_AVERAGING)));
+                }
+
+                // Se habilita la opción de guardar imágen.
+                Menu_File_Save.setEnabled(true);
+                Menu_File_SaveAs.setEnabled(true);
             }
         }
     }
