@@ -101,6 +101,8 @@ public class Pexels extends javax.swing.JFrame
                 
                 // Se habilitan los botones de acción //
                 Menu_Operator_Negative.setEnabled(true);
+                Menu_Operator_BlackNWhite.setEnabled(true);
+
             }
         }
     }
@@ -203,10 +205,6 @@ public class Pexels extends javax.swing.JFrame
         
         // Se obtiene en RAM, el archivo que se desea manipular.
         File tempFile = new File(path);
-        /*if (!tempFile.exists())
-        {
-            return;
-        }*/
         
         // Se intenta el cambio de colores.
         try
@@ -258,6 +256,31 @@ public class Pexels extends javax.swing.JFrame
                             r[x][y] = (short) (255 - r[x][y]);
                             g[x][y] = (short) (255 - g[x][y]);
                             b[x][y] = (short) (255 - b[x][y]);
+                        }
+                    }
+                break;
+                
+                // Blanco y negro //
+                case 1:
+                    double medium;
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            double r12 = r[x][y], g12 = g[x][y], b12 = b[x][y];
+                            medium = (r12 + g12 + b12) / 3;
+                            if (medium > 128)
+                            {
+                                r[x][y] = (short) (255);
+                                g[x][y] = (short) (255);
+                                b[x][y] = (short) (255);
+                            }
+                            else
+                            {
+                                r[x][y] = (short) (0);
+                                g[x][y] = (short) (0);
+                                b[x][y] = (short) (0);
+                            }
                         }
                     }
                 break;
@@ -462,7 +485,7 @@ public class Pexels extends javax.swing.JFrame
     }//GEN-LAST:event_Menu_Operator_NegativeActionPerformed
 
     private void Menu_Operator_BlackNWhiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_BlackNWhiteActionPerformed
-        // TODO add your handling code here:
+        operateImage(1, Picture);
     }//GEN-LAST:event_Menu_Operator_BlackNWhiteActionPerformed
 
     private void Menu_Operator_GreysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_GreysActionPerformed
