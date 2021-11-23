@@ -102,6 +102,7 @@ public class Pexels extends javax.swing.JFrame
                 // Se habilitan los botones de acción //
                 Menu_Operator_Negative.setEnabled(true);
                 Menu_Operator_BlackNWhite.setEnabled(true);
+                Menu_Operator_Greys.setEnabled(true);
 
             }
         }
@@ -281,6 +282,19 @@ public class Pexels extends javax.swing.JFrame
                                 g[x][y] = (short) (0);
                                 b[x][y] = (short) (0);
                             }
+                        }
+                    }
+                break;
+                
+                // Escala de grises //
+                case 2:
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            r[x][y] = (short) ((r[x][y] + g[x][y] + b[x][y]) / 3);
+                            g[x][y] = r[x][y];
+                            b[x][y] = r[x][y];
                         }
                     }
                 break;
@@ -489,7 +503,7 @@ public class Pexels extends javax.swing.JFrame
     }//GEN-LAST:event_Menu_Operator_BlackNWhiteActionPerformed
 
     private void Menu_Operator_GreysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_GreysActionPerformed
-        // TODO add your handling code here:
+        operateImage(2, Picture);
     }//GEN-LAST:event_Menu_Operator_GreysActionPerformed
 
     private void Menu_Operator_LightenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_LightenActionPerformed
