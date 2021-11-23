@@ -2,7 +2,12 @@ package pexels;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 // Escrito a prisas por Alejandro Ramos | @arhcoder.
@@ -13,6 +18,9 @@ public class Pexels extends javax.swing.JFrame
     File picture;
     byte[] image;
     String path;
+    
+    BufferedImage bufferedImage;
+    int modifications = 0;
     
     // Filters //
     FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("Imágen PNG","png");
@@ -60,7 +68,7 @@ public class Pexels extends javax.swing.JFrame
         {
             // Filtra las extensiones de imagen.
             picture = fileChooser.getSelectedFile();
-            
+            modifications = 0;
             if (picture.canRead())
             {
                 // Abre la imagen seleccionada.
@@ -89,6 +97,10 @@ public class Pexels extends javax.swing.JFrame
                 // Se habilita la opción de guardar imágen.
                 Menu_File_Save.setEnabled(true);
                 Menu_File_SaveAs.setEnabled(true);
+                Menu_File_Reset.setEnabled(true);
+                
+                // Se habilitan los botones de acción //
+                Menu_Operator_Negative.setEnabled(true);
             }
         }
     }
@@ -159,8 +171,132 @@ public class Pexels extends javax.swing.JFrame
         }
     }
     
-    // Image manipulation //
+    public void resetImage(JLabel canvas)
+    {
+        // Se ajusta la imágen al tamaño de la pestaña.
+        Toolkit tool = Toolkit.getDefaultToolkit();
+        Image RAMImage = tool.createImage(path);
+
+        // Se escala a lo ancho si la imagen es más ancha que alta //
+        if(RAMImage.getWidth(this) > RAMImage.getHeight(this))
+        {
+            canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(canvas.getWidth(), -1, Image.SCALE_AREA_AVERAGING)));
+        }
+        // Se escala a lo alto si la imagene es más alta que ancha, o cuadrada //
+        else
+        {
+            canvas.setIcon(new ImageIcon(RAMImage.getScaledInstance(-1, canvas.getHeight(), Image.SCALE_AREA_AVERAGING)));
+        }
+        modifications = 0;
+    }
     
+    // Image manipulation //
+    public void operateImage(int operator, JLabel canvas)
+    {
+        /// Recibe un operador [entero], y en base a él, transforma la imágen y
+        /// la redibuja en el canvas [JLabel].
+        /// [0] = Negativo.
+        /// [1] = Blanco y negro.
+        /// [2] = Escala de grises
+        /// [3] = Aclarar.
+        /// [4] = Oscurecer.
+        
+        // Se obtiene en RAM, el archivo que se desea manipular.
+        File tempFile = new File(path);
+        /*if (!tempFile.exists())
+        {
+            return;
+        }*/
+        
+        // Se intenta el cambio de colores.
+        try
+        {
+            BufferedImage RAMImage = ImageIO.read(tempFile);
+            if (modifications == 0)
+            {
+                modifications++;
+            }
+            else
+            {
+                RAMImage = bufferedImage;
+            }
+            
+            int width = RAMImage.getWidth();
+            int height = RAMImage.getHeight();
+            int rgbArray[] = new int[width * height];
+            
+            RAMImage.getRGB(0, 0, width, height, rgbArray, 0, width);
+            ColorModel cm = ColorModel.getRGBdefault(); 		
+            
+            short r[][] = new short[width][height];
+            short g[][] = new short[width][height];
+            short b[][] = new short[width][height];
+            
+            int i = 0;
+
+            // Se descompone la imágen en RGB en un arreglo.
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    i = x + y * width;
+                    b[x][y] = (short) cm.getBlue(rgbArray[i]);
+                    g[x][y] = (short) cm.getGreen(rgbArray[i]);
+                    r[x][y] = (short) cm.getRed(rgbArray[i]);
+                }
+            }
+            
+            // Se elige el operador //
+            switch (operator)
+            {
+                // Negativo //
+                case 0:
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            r[x][y] = (short) (255 - r[x][y]);
+                            g[x][y] = (short) (255 - g[x][y]);
+                            b[x][y] = (short) (255 - b[x][y]);
+                        }
+                    }
+                break;
+            }
+            
+            // Se convierte el arreglo.
+            int array[] = new int[width * height];
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    array[x + y * width]
+                    = 0xff000000
+                    | (r[x][y] << 16)
+                    | (g[x][y] << 8)
+                    | b[x][y];
+                }
+            }
+
+            bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); 
+            bufferedImage.setRGB(0, 0, width, height, array, 0, width);
+            
+            // Se escala a lo ancho si la imagen es más ancha que alta //
+            if(bufferedImage.getWidth(this) > bufferedImage.getHeight(this))
+            {
+                canvas.setIcon(new ImageIcon(bufferedImage.getScaledInstance(canvas.getWidth(), -1, Image.SCALE_AREA_AVERAGING)));
+            }
+            // Se escala a lo alto si la imagene es más alta que ancha, o cuadrada //
+            else
+            {
+                canvas.setIcon(new ImageIcon(bufferedImage.getScaledInstance(-1, canvas.getHeight(), Image.SCALE_AREA_AVERAGING)));
+            }
+            RAMImage = bufferedImage;
+        }
+        catch (Exception colorPrintException)
+        {
+            System.out.println("¡Ni idea de lo que sucedió!");
+        }
+    }
     
     public Pexels()
     {
@@ -178,7 +314,13 @@ public class Pexels extends javax.swing.JFrame
         Menu_File_Open = new javax.swing.JMenuItem();
         Menu_File_Save = new javax.swing.JMenuItem();
         Menu_File_SaveAs = new javax.swing.JMenuItem();
+        Menu_File_Reset = new javax.swing.JMenuItem();
         Menu_Operators = new javax.swing.JMenu();
+        Menu_Operator_Negative = new javax.swing.JMenuItem();
+        Menu_Operator_BlackNWhite = new javax.swing.JMenuItem();
+        Menu_Operator_Greys = new javax.swing.JMenuItem();
+        Menu_Operator_Lighten = new javax.swing.JMenuItem();
+        Menu_Operator_Darken = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Pexels");
@@ -222,9 +364,65 @@ public class Pexels extends javax.swing.JFrame
         });
         Menu_File.add(Menu_File_SaveAs);
 
+        Menu_File_Reset.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        Menu_File_Reset.setText("Restaurar");
+        Menu_File_Reset.setEnabled(false);
+        Menu_File_Reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_File_ResetActionPerformed(evt);
+            }
+        });
+        Menu_File.add(Menu_File_Reset);
+
         Menu.add(Menu_File);
 
         Menu_Operators.setText("Operadores");
+
+        Menu_Operator_Negative.setText("Negativo");
+        Menu_Operator_Negative.setEnabled(false);
+        Menu_Operator_Negative.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Operator_NegativeActionPerformed(evt);
+            }
+        });
+        Menu_Operators.add(Menu_Operator_Negative);
+
+        Menu_Operator_BlackNWhite.setText("Blanco y negro");
+        Menu_Operator_BlackNWhite.setEnabled(false);
+        Menu_Operator_BlackNWhite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Operator_BlackNWhiteActionPerformed(evt);
+            }
+        });
+        Menu_Operators.add(Menu_Operator_BlackNWhite);
+
+        Menu_Operator_Greys.setText("Escala de grises");
+        Menu_Operator_Greys.setEnabled(false);
+        Menu_Operator_Greys.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Operator_GreysActionPerformed(evt);
+            }
+        });
+        Menu_Operators.add(Menu_Operator_Greys);
+
+        Menu_Operator_Lighten.setText("Aclarar");
+        Menu_Operator_Lighten.setEnabled(false);
+        Menu_Operator_Lighten.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Operator_LightenActionPerformed(evt);
+            }
+        });
+        Menu_Operators.add(Menu_Operator_Lighten);
+
+        Menu_Operator_Darken.setText("Oscurecer");
+        Menu_Operator_Darken.setEnabled(false);
+        Menu_Operator_Darken.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Operator_DarkenActionPerformed(evt);
+            }
+        });
+        Menu_Operators.add(Menu_Operator_Darken);
+
         Menu.add(Menu_Operators);
 
         setJMenuBar(Menu);
@@ -254,6 +452,30 @@ public class Pexels extends javax.swing.JFrame
     private void Menu_File_SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_File_SaveAsActionPerformed
         saveImageAs();
     }//GEN-LAST:event_Menu_File_SaveAsActionPerformed
+
+    private void Menu_File_ResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_File_ResetActionPerformed
+        resetImage(Picture);
+    }//GEN-LAST:event_Menu_File_ResetActionPerformed
+
+    private void Menu_Operator_NegativeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_NegativeActionPerformed
+        operateImage(0, Picture);
+    }//GEN-LAST:event_Menu_Operator_NegativeActionPerformed
+
+    private void Menu_Operator_BlackNWhiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_BlackNWhiteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Menu_Operator_BlackNWhiteActionPerformed
+
+    private void Menu_Operator_GreysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_GreysActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Menu_Operator_GreysActionPerformed
+
+    private void Menu_Operator_LightenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_LightenActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Menu_Operator_LightenActionPerformed
+
+    private void Menu_Operator_DarkenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_DarkenActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Menu_Operator_DarkenActionPerformed
 
     public static void main(String args[])
     {
@@ -290,8 +512,14 @@ public class Pexels extends javax.swing.JFrame
     private javax.swing.JMenuBar Menu;
     private javax.swing.JMenu Menu_File;
     private javax.swing.JMenuItem Menu_File_Open;
+    private javax.swing.JMenuItem Menu_File_Reset;
     private javax.swing.JMenuItem Menu_File_Save;
     private javax.swing.JMenuItem Menu_File_SaveAs;
+    private javax.swing.JMenuItem Menu_Operator_BlackNWhite;
+    private javax.swing.JMenuItem Menu_Operator_Darken;
+    private javax.swing.JMenuItem Menu_Operator_Greys;
+    private javax.swing.JMenuItem Menu_Operator_Lighten;
+    private javax.swing.JMenuItem Menu_Operator_Negative;
     private javax.swing.JMenu Menu_Operators;
     private javax.swing.JLabel Picture;
     // End of variables declaration//GEN-END:variables
