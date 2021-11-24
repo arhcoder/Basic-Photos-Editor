@@ -12,7 +12,8 @@ import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import static java.lang.Math.pow;
 
-// Escrito a prisas por Alejandro Ramos | @arhcoder.
+/// Escrito a prisas por Alejandro Ramos | @arhcoder.
+/// Versión 1.0.0: Noviembre 24, 2021.
 
 public class Pexels extends javax.swing.JFrame
 {
