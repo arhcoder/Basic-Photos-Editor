@@ -8,7 +8,6 @@ import java.io.*;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import static java.lang.Math.pow;
-import static javax.swing.Spring.scale;
 
 // Escrito a prisas por Alejandro Ramos | @arhcoder.
 
@@ -99,12 +98,18 @@ public class Pexels extends javax.swing.JFrame
                 Menu_File_SaveAs.setEnabled(true);
                 Menu_File_Reset.setEnabled(true);
                 
-                // Se habilitan los botones de acción //
+                // Se habilitan los botones de operadores //
                 Menu_Operator_Negative.setEnabled(true);
                 Menu_Operator_BlackNWhite.setEnabled(true);
                 Menu_Operator_Greys.setEnabled(true);
                 Menu_Operator_Lighten.setEnabled(true);
                 Menu_Operator_Darken.setEnabled(true);
+                
+                // Se habilitan los botones de filtros //
+                Menu_Filter_Laplace.setEnabled(true);
+                Menu_Filter_Prewitt.setEnabled(true);
+                Menu_Filter_Roberts.setEnabled(true);
+                Menu_Filter_Sobel.setEnabled(true);
             }
         }
     }
@@ -378,7 +383,6 @@ public class Pexels extends javax.swing.JFrame
         /// [2] = Roberts.
         /// [3] = Sobel.
         
-        // Se intenta el cambio de colores.
         try
         {
             // Se obtiene en RAM, el archivo que se desea manipular.
@@ -398,26 +402,6 @@ public class Pexels extends javax.swing.JFrame
             int height = RAMImage.getHeight();
             int[][] colorMatrix = new int[width][height];
             int maxGradient = -1;
-            int val00, val01, val02, val10, val11, val12, val20, val21, val22;
-            val00 = val01 = val02 = val10 = val11 = val12 = val20 = val21 = val22 = 0;
-            
-            for (int i = 1; i < width - 1; i++)
-            {
-                for (int j = 1; j < height - 1; j++)
-                {
-                    val00 = getGrayScale(RAMImage.getRGB(i - 1, j - 1));
-                    val01 = getGrayScale(RAMImage.getRGB(i - 1, j));
-                    val02 = getGrayScale(RAMImage.getRGB(i - 1, j + 1));
-
-                    val10 = getGrayScale(RAMImage.getRGB(i, j - 1));
-                    val11 = getGrayScale(RAMImage.getRGB(i, j));
-                    val12 = getGrayScale(RAMImage.getRGB(i, j + 1));
-
-                    val20 = getGrayScale(RAMImage.getRGB(i + 1, j - 1));
-                    val21 = getGrayScale(RAMImage.getRGB(i + 1, j));
-                    val22 = getGrayScale(RAMImage.getRGB(i + 1, j + 1));
-                }
-            }
             
             // Se elige el operador //
             switch (filter)
@@ -428,6 +412,18 @@ public class Pexels extends javax.swing.JFrame
                     {
                         for (int j = 1; j < height - 1; j++)
                         {
+                            int val00 = getGrayScale(RAMImage.getRGB(i - 1, j - 1));
+                            int val01 = getGrayScale(RAMImage.getRGB(i - 1, j));
+                            int val02 = getGrayScale(RAMImage.getRGB(i - 1, j + 1));
+
+                            int val10 = getGrayScale(RAMImage.getRGB(i, j - 1));
+                            int val11 = getGrayScale(RAMImage.getRGB(i, j));
+                            int val12 = getGrayScale(RAMImage.getRGB(i, j + 1));
+
+                            int val20 = getGrayScale(RAMImage.getRGB(i + 1, j - 1));
+                            int val21 = getGrayScale(RAMImage.getRGB(i + 1, j));
+                            int val22 = getGrayScale(RAMImage.getRGB(i + 1, j + 1));
+                    
                             int gx =  ((0 * val00) + (1 * val01) + (0 * val02)) 
                             + ((1 * val10) + (-4 * val11) + (1 * val12))
                             + ((0 * val20) + (1 * val21) + (0 * val22));
@@ -438,7 +434,6 @@ public class Pexels extends javax.swing.JFrame
 
                             double grayValue = Math.sqrt((gx * gx) + (gy * gy));
                             int gray = (int) grayValue;
-
                             if(maxGradient < gray)
                             {
                                 maxGradient = gray;
@@ -454,8 +449,28 @@ public class Pexels extends javax.swing.JFrame
                     {
                         for (int j = 1; j < height - 1; j++)
                         {
+                            int val00 = getGrayScale(RAMImage.getRGB(i - 1, j - 1));
+                            int val01 = getGrayScale(RAMImage.getRGB(i - 1, j));
+                            int val02 = getGrayScale(RAMImage.getRGB(i - 1, j + 1));
+
+                            int val10 = getGrayScale(RAMImage.getRGB(i, j - 1));
+                            int val11 = getGrayScale(RAMImage.getRGB(i, j));
+                            int val12 = getGrayScale(RAMImage.getRGB(i, j + 1));
+
+                            int val20 = getGrayScale(RAMImage.getRGB(i + 1, j - 1));
+                            int val21 = getGrayScale(RAMImage.getRGB(i + 1, j));
+                            int val22 = getGrayScale(RAMImage.getRGB(i + 1, j + 1));
+                    
+                            int gx =  ((-1 * val00) + (0 * val01) + (1 * val02)) 
+                            + ((-1 * val10) + (0 * val11) + (1 * val12))
+                            + ((-1 * val20) + (0 * val21) + (1 * val22));
+
+                            int gy =  ((-1 * val00) + (-1 * val01) + (-1 * val02))
+                            + ((0 * val10) + (0 * val11) + (0 * val12))
+                            + ((1 * val20) + (1 * val21) + (1 * val22));
                             
-                            
+                            double grayValue = Math.sqrt((gx * gx) + (gy * gy));
+                            int gray = (int) grayValue;
                             if(maxGradient < gray)
                             {
                                 maxGradient = gray;
@@ -471,8 +486,20 @@ public class Pexels extends javax.swing.JFrame
                     {
                         for (int j = 1; j < height - 1; j++)
                         {
+                            int val00 = getGrayScale(RAMImage.getRGB(i - 1, j - 1));
+                            int val01 = getGrayScale(RAMImage.getRGB(i - 1, j));
+
+                            int val10 = getGrayScale(RAMImage.getRGB(i, j - 1));
+                            int val11 = getGrayScale(RAMImage.getRGB(i, j));
                             
+                            int gx =  ((-1 * val00) + (0 * val01)) 
+                            + ((0 * val10) + (1 * val11));
+
+                            int gy =  ((0 * val00) + (-1 * val01))
+                            + ((1 * val10) + (0 * val11));
                             
+                            double grayValue = Math.sqrt((gx * gx) + (gy * gy));
+                            int gray = (int) grayValue;
                             if(maxGradient < gray)
                             {
                                 maxGradient = gray;
@@ -488,8 +515,28 @@ public class Pexels extends javax.swing.JFrame
                     {
                         for (int j = 1; j < height - 1; j++)
                         {
+                            int val00 = getGrayScale(RAMImage.getRGB(i - 1, j - 1));
+                            int val01 = getGrayScale(RAMImage.getRGB(i - 1, j));
+                            int val02 = getGrayScale(RAMImage.getRGB(i - 1, j + 1));
+
+                            int val10 = getGrayScale(RAMImage.getRGB(i, j - 1));
+                            int val11 = getGrayScale(RAMImage.getRGB(i, j));
+                            int val12 = getGrayScale(RAMImage.getRGB(i, j + 1));
+
+                            int val20 = getGrayScale(RAMImage.getRGB(i + 1, j - 1));
+                            int val21 = getGrayScale(RAMImage.getRGB(i + 1, j));
+                            int val22 = getGrayScale(RAMImage.getRGB(i + 1, j + 1));
+                    
+                            int gx =  ((-1 * val00) + (0 * val01) + (1 * val02)) 
+                            + ((-2 * val10) + (0 * val11) + (2 * val12))
+                            + ((-1 * val20) + (0 * val21) + (1 * val22));
+                        
+                            int gy =  ((-1 * val00) + (-2 * val01) + (-1 * val02))
+                            + ((0 * val10) + (0 * val11) + (0 * val12))
+                            + ((1 * val20) + (2 * val21) + (1 * val22));
                             
-                            
+                            double grayValue = Math.sqrt((gx * gx) + (gy * gy));
+                            int gray = (int) grayValue;
                             if(maxGradient < gray)
                             {
                                 maxGradient = gray;
@@ -562,7 +609,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_Filter_Laplace = new javax.swing.JMenuItem();
         Menu_Filter_Prewitt = new javax.swing.JMenuItem();
         Menu_Filter_Roberts = new javax.swing.JMenuItem();
-        Menu_Filer_Sobel = new javax.swing.JMenuItem();
+        Menu_Filter_Sobel = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Pexels");
@@ -670,6 +717,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_Filters.setText("Filtros");
 
         Menu_Filter_Laplace.setText("Laplace");
+        Menu_Filter_Laplace.setEnabled(false);
         Menu_Filter_Laplace.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Menu_Filter_LaplaceActionPerformed(evt);
@@ -678,6 +726,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_Filters.add(Menu_Filter_Laplace);
 
         Menu_Filter_Prewitt.setText("Prewitt");
+        Menu_Filter_Prewitt.setEnabled(false);
         Menu_Filter_Prewitt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Menu_Filter_PrewittActionPerformed(evt);
@@ -686,6 +735,7 @@ public class Pexels extends javax.swing.JFrame
         Menu_Filters.add(Menu_Filter_Prewitt);
 
         Menu_Filter_Roberts.setText("Roberts");
+        Menu_Filter_Roberts.setEnabled(false);
         Menu_Filter_Roberts.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Menu_Filter_RobertsActionPerformed(evt);
@@ -693,13 +743,14 @@ public class Pexels extends javax.swing.JFrame
         });
         Menu_Filters.add(Menu_Filter_Roberts);
 
-        Menu_Filer_Sobel.setText("Sobel");
-        Menu_Filer_Sobel.addActionListener(new java.awt.event.ActionListener() {
+        Menu_Filter_Sobel.setText("Sobel");
+        Menu_Filter_Sobel.setEnabled(false);
+        Menu_Filter_Sobel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Filer_SobelActionPerformed(evt);
+                Menu_Filter_SobelActionPerformed(evt);
             }
         });
-        Menu_Filters.add(Menu_Filer_Sobel);
+        Menu_Filters.add(Menu_Filter_Sobel);
 
         Menu.add(Menu_Filters);
 
@@ -767,9 +818,9 @@ public class Pexels extends javax.swing.JFrame
         filterImage(2, Picture);
     }//GEN-LAST:event_Menu_Filter_RobertsActionPerformed
 
-    private void Menu_Filer_SobelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filer_SobelActionPerformed
+    private void Menu_Filter_SobelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_SobelActionPerformed
         filterImage(3, Picture);
-    }//GEN-LAST:event_Menu_Filer_SobelActionPerformed
+    }//GEN-LAST:event_Menu_Filter_SobelActionPerformed
 
     public static void main(String args[])
     {
@@ -809,10 +860,10 @@ public class Pexels extends javax.swing.JFrame
     private javax.swing.JMenuItem Menu_File_Reset;
     private javax.swing.JMenuItem Menu_File_Save;
     private javax.swing.JMenuItem Menu_File_SaveAs;
-    private javax.swing.JMenuItem Menu_Filer_Sobel;
     private javax.swing.JMenuItem Menu_Filter_Laplace;
     private javax.swing.JMenuItem Menu_Filter_Prewitt;
     private javax.swing.JMenuItem Menu_Filter_Roberts;
+    private javax.swing.JMenuItem Menu_Filter_Sobel;
     private javax.swing.JMenu Menu_Filters;
     private javax.swing.JMenuItem Menu_Operator_BlackNWhite;
     private javax.swing.JMenuItem Menu_Operator_Darken;
