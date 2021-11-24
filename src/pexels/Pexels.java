@@ -2,10 +2,13 @@ package pexels;
 
 import javax.swing.*;
 import java.awt.*;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+
 import java.io.*;
 import javax.imageio.ImageIO;
+
 import javax.swing.filechooser.FileNameExtensionFilter;
 import static java.lang.Math.pow;
 
@@ -22,6 +25,7 @@ public class Pexels extends javax.swing.JFrame
     int modifications = 0;
     
     // Filters //
+    FileNameExtensionFilter imagesFilter = new FileNameExtensionFilter("Todas las imágenes","png", "jpg", "jpeg", "bmp");
     FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("Imágen PNG","png");
     FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter("Imágen JPG","jpg");
     FileNameExtensionFilter jpegFilter = new FileNameExtensionFilter("Imágen JPEG","jpeg");
@@ -57,10 +61,7 @@ public class Pexels extends javax.swing.JFrame
         
         // Abre un selector de archivos con filtro de imágenes.
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.addChoosableFileFilter(pngFilter);
-        fileChooser.addChoosableFileFilter(jpgFilter);
-        fileChooser.addChoosableFileFilter(jpegFilter);
-        fileChooser.addChoosableFileFilter(bmpFilter);
+        fileChooser.addChoosableFileFilter(imagesFilter);
         fileChooser.setAcceptAllFileFilterUsed(false);
         
         if (fileChooser.showDialog(null, "Seleccione su archivo") == JFileChooser.APPROVE_OPTION)
@@ -98,18 +99,18 @@ public class Pexels extends javax.swing.JFrame
                 Menu_File_SaveAs.setEnabled(true);
                 Menu_File_Reset.setEnabled(true);
                 
-                // Se habilitan los botones de operadores //
-                Menu_Operator_Negative.setEnabled(true);
-                Menu_Operator_BlackNWhite.setEnabled(true);
-                Menu_Operator_Greys.setEnabled(true);
-                Menu_Operator_Lighten.setEnabled(true);
-                Menu_Operator_Darken.setEnabled(true);
-                
                 // Se habilitan los botones de filtros //
-                Menu_Filter_Laplace.setEnabled(true);
-                Menu_Filter_Prewitt.setEnabled(true);
-                Menu_Filter_Roberts.setEnabled(true);
-                Menu_Filter_Sobel.setEnabled(true);
+                Menu_Filter_Negative.setEnabled(true);
+                Menu_Filter_BlackNWhite.setEnabled(true);
+                Menu_Filter_Grays.setEnabled(true);
+                Menu_Filter_Lighten.setEnabled(true);
+                Menu_Filter_Darken.setEnabled(true);
+                
+                // Se habilitan los botones de bordes //
+                Menu_Border_Laplace.setEnabled(true);
+                Menu_Border_Prewitt.setEnabled(true);
+                Menu_Border_Roberts.setEnabled(true);
+                Menu_Border_Sobel.setEnabled(true);
             }
         }
     }
@@ -200,10 +201,10 @@ public class Pexels extends javax.swing.JFrame
     }
     
     // Image manipulation //
-    public void operateImage(int operator, JLabel canvas)
+    public void applyFilter(int filter, JLabel canvas)
     {
-        /// Recibe un operador [entero], y en base a él, transforma la imágen y
-        /// la redibuja en el canvas [JLabel].
+        /// Recibe un filtro [número entero], y en base a él, transforma la
+        /// imágen y la redibuja en el canvas [JLabel].
         /// [0] = Negativo.
         /// [1] = Blanco y negro.
         /// [2] = Escala de grises.
@@ -251,8 +252,8 @@ public class Pexels extends javax.swing.JFrame
                 }
             }
             
-            // Se elige el operador //
-            switch (operator)
+            // Se elige el filtro //
+            switch (filter)
             {
                 // Negativo //
                 case 0:
@@ -374,10 +375,10 @@ public class Pexels extends javax.swing.JFrame
         }
     }
     
-    public void filterImage(int filter, JLabel canvas)
+    public void drawBorders(int kind, JLabel canvas)
     {
-        /// Recibe un filtro [entero], y en base a él, transforma la imágen y
-        /// la redibuja en el canvas [JLabel].
+        /// Recibe un tipo de borde [número entero], y en base a él, transforma
+        /// la imágen y la redibuja en el canvas [JLabel].
         /// [0] = Laplace.
         /// [1] = Prewitt.
         /// [2] = Roberts.
@@ -403,8 +404,8 @@ public class Pexels extends javax.swing.JFrame
             int[][] colorMatrix = new int[width][height];
             int maxGradient = -1;
             
-            // Se elige el operador //
-            switch (filter)
+            // Se elige el tipo de bordes //
+            switch (kind)
             {
                 // Laplace //
                 case 0:
@@ -599,17 +600,17 @@ public class Pexels extends javax.swing.JFrame
         Menu_File_Save = new javax.swing.JMenuItem();
         Menu_File_SaveAs = new javax.swing.JMenuItem();
         Menu_File_Reset = new javax.swing.JMenuItem();
-        Menu_Operators = new javax.swing.JMenu();
-        Menu_Operator_Negative = new javax.swing.JMenuItem();
-        Menu_Operator_BlackNWhite = new javax.swing.JMenuItem();
-        Menu_Operator_Greys = new javax.swing.JMenuItem();
-        Menu_Operator_Lighten = new javax.swing.JMenuItem();
-        Menu_Operator_Darken = new javax.swing.JMenuItem();
         Menu_Filters = new javax.swing.JMenu();
-        Menu_Filter_Laplace = new javax.swing.JMenuItem();
-        Menu_Filter_Prewitt = new javax.swing.JMenuItem();
-        Menu_Filter_Roberts = new javax.swing.JMenuItem();
-        Menu_Filter_Sobel = new javax.swing.JMenuItem();
+        Menu_Filter_Negative = new javax.swing.JMenuItem();
+        Menu_Filter_BlackNWhite = new javax.swing.JMenuItem();
+        Menu_Filter_Grays = new javax.swing.JMenuItem();
+        Menu_Filter_Lighten = new javax.swing.JMenuItem();
+        Menu_Filter_Darken = new javax.swing.JMenuItem();
+        Menu_Borders = new javax.swing.JMenu();
+        Menu_Border_Laplace = new javax.swing.JMenuItem();
+        Menu_Border_Prewitt = new javax.swing.JMenuItem();
+        Menu_Border_Roberts = new javax.swing.JMenuItem();
+        Menu_Border_Sobel = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Pexels");
@@ -665,94 +666,94 @@ public class Pexels extends javax.swing.JFrame
 
         Menu.add(Menu_File);
 
-        Menu_Operators.setText("Operadores");
-
-        Menu_Operator_Negative.setText("Negativo");
-        Menu_Operator_Negative.setEnabled(false);
-        Menu_Operator_Negative.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Operator_NegativeActionPerformed(evt);
-            }
-        });
-        Menu_Operators.add(Menu_Operator_Negative);
-
-        Menu_Operator_BlackNWhite.setText("Blanco y negro");
-        Menu_Operator_BlackNWhite.setEnabled(false);
-        Menu_Operator_BlackNWhite.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Operator_BlackNWhiteActionPerformed(evt);
-            }
-        });
-        Menu_Operators.add(Menu_Operator_BlackNWhite);
-
-        Menu_Operator_Greys.setText("Escala de grises");
-        Menu_Operator_Greys.setEnabled(false);
-        Menu_Operator_Greys.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Operator_GreysActionPerformed(evt);
-            }
-        });
-        Menu_Operators.add(Menu_Operator_Greys);
-
-        Menu_Operator_Lighten.setText("Aclarar");
-        Menu_Operator_Lighten.setEnabled(false);
-        Menu_Operator_Lighten.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Operator_LightenActionPerformed(evt);
-            }
-        });
-        Menu_Operators.add(Menu_Operator_Lighten);
-
-        Menu_Operator_Darken.setText("Oscurecer");
-        Menu_Operator_Darken.setEnabled(false);
-        Menu_Operator_Darken.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Operator_DarkenActionPerformed(evt);
-            }
-        });
-        Menu_Operators.add(Menu_Operator_Darken);
-
-        Menu.add(Menu_Operators);
-
         Menu_Filters.setText("Filtros");
 
-        Menu_Filter_Laplace.setText("Laplace");
-        Menu_Filter_Laplace.setEnabled(false);
-        Menu_Filter_Laplace.addActionListener(new java.awt.event.ActionListener() {
+        Menu_Filter_Negative.setText("Negativo");
+        Menu_Filter_Negative.setEnabled(false);
+        Menu_Filter_Negative.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Filter_LaplaceActionPerformed(evt);
+                Menu_Filter_NegativeActionPerformed(evt);
             }
         });
-        Menu_Filters.add(Menu_Filter_Laplace);
+        Menu_Filters.add(Menu_Filter_Negative);
 
-        Menu_Filter_Prewitt.setText("Prewitt");
-        Menu_Filter_Prewitt.setEnabled(false);
-        Menu_Filter_Prewitt.addActionListener(new java.awt.event.ActionListener() {
+        Menu_Filter_BlackNWhite.setText("Blanco y negro");
+        Menu_Filter_BlackNWhite.setEnabled(false);
+        Menu_Filter_BlackNWhite.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Filter_PrewittActionPerformed(evt);
+                Menu_Filter_BlackNWhiteActionPerformed(evt);
             }
         });
-        Menu_Filters.add(Menu_Filter_Prewitt);
+        Menu_Filters.add(Menu_Filter_BlackNWhite);
 
-        Menu_Filter_Roberts.setText("Roberts");
-        Menu_Filter_Roberts.setEnabled(false);
-        Menu_Filter_Roberts.addActionListener(new java.awt.event.ActionListener() {
+        Menu_Filter_Grays.setText("Escala de grises");
+        Menu_Filter_Grays.setEnabled(false);
+        Menu_Filter_Grays.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Filter_RobertsActionPerformed(evt);
+                Menu_Filter_GraysActionPerformed(evt);
             }
         });
-        Menu_Filters.add(Menu_Filter_Roberts);
+        Menu_Filters.add(Menu_Filter_Grays);
 
-        Menu_Filter_Sobel.setText("Sobel");
-        Menu_Filter_Sobel.setEnabled(false);
-        Menu_Filter_Sobel.addActionListener(new java.awt.event.ActionListener() {
+        Menu_Filter_Lighten.setText("Aclarar");
+        Menu_Filter_Lighten.setEnabled(false);
+        Menu_Filter_Lighten.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Menu_Filter_SobelActionPerformed(evt);
+                Menu_Filter_LightenActionPerformed(evt);
             }
         });
-        Menu_Filters.add(Menu_Filter_Sobel);
+        Menu_Filters.add(Menu_Filter_Lighten);
+
+        Menu_Filter_Darken.setText("Oscurecer");
+        Menu_Filter_Darken.setEnabled(false);
+        Menu_Filter_Darken.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Filter_DarkenActionPerformed(evt);
+            }
+        });
+        Menu_Filters.add(Menu_Filter_Darken);
 
         Menu.add(Menu_Filters);
+
+        Menu_Borders.setText("Bordes");
+
+        Menu_Border_Laplace.setText("Laplace");
+        Menu_Border_Laplace.setEnabled(false);
+        Menu_Border_Laplace.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Border_LaplaceActionPerformed(evt);
+            }
+        });
+        Menu_Borders.add(Menu_Border_Laplace);
+
+        Menu_Border_Prewitt.setText("Prewitt");
+        Menu_Border_Prewitt.setEnabled(false);
+        Menu_Border_Prewitt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Border_PrewittActionPerformed(evt);
+            }
+        });
+        Menu_Borders.add(Menu_Border_Prewitt);
+
+        Menu_Border_Roberts.setText("Roberts");
+        Menu_Border_Roberts.setEnabled(false);
+        Menu_Border_Roberts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Border_RobertsActionPerformed(evt);
+            }
+        });
+        Menu_Borders.add(Menu_Border_Roberts);
+
+        Menu_Border_Sobel.setText("Sobel");
+        Menu_Border_Sobel.setEnabled(false);
+        Menu_Border_Sobel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Menu_Border_SobelActionPerformed(evt);
+            }
+        });
+        Menu_Borders.add(Menu_Border_Sobel);
+
+        Menu.add(Menu_Borders);
 
         setJMenuBar(Menu);
 
@@ -786,41 +787,41 @@ public class Pexels extends javax.swing.JFrame
         resetImage(Picture);
     }//GEN-LAST:event_Menu_File_ResetActionPerformed
 
-    private void Menu_Operator_NegativeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_NegativeActionPerformed
-        operateImage(0, Picture);
-    }//GEN-LAST:event_Menu_Operator_NegativeActionPerformed
+    private void Menu_Filter_NegativeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_NegativeActionPerformed
+        applyFilter(0, Picture);
+    }//GEN-LAST:event_Menu_Filter_NegativeActionPerformed
 
-    private void Menu_Operator_BlackNWhiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_BlackNWhiteActionPerformed
-        operateImage(1, Picture);
-    }//GEN-LAST:event_Menu_Operator_BlackNWhiteActionPerformed
+    private void Menu_Filter_BlackNWhiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_BlackNWhiteActionPerformed
+        applyFilter(1, Picture);
+    }//GEN-LAST:event_Menu_Filter_BlackNWhiteActionPerformed
 
-    private void Menu_Operator_GreysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_GreysActionPerformed
-        operateImage(2, Picture);
-    }//GEN-LAST:event_Menu_Operator_GreysActionPerformed
+    private void Menu_Filter_GraysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_GraysActionPerformed
+        applyFilter(2, Picture);
+    }//GEN-LAST:event_Menu_Filter_GraysActionPerformed
 
-    private void Menu_Operator_LightenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_LightenActionPerformed
-        operateImage(3, Picture);
-    }//GEN-LAST:event_Menu_Operator_LightenActionPerformed
+    private void Menu_Filter_LightenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_LightenActionPerformed
+        applyFilter(3, Picture);
+    }//GEN-LAST:event_Menu_Filter_LightenActionPerformed
 
-    private void Menu_Operator_DarkenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Operator_DarkenActionPerformed
-        operateImage(4, Picture);
-    }//GEN-LAST:event_Menu_Operator_DarkenActionPerformed
+    private void Menu_Filter_DarkenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_DarkenActionPerformed
+        applyFilter(4, Picture);
+    }//GEN-LAST:event_Menu_Filter_DarkenActionPerformed
 
-    private void Menu_Filter_LaplaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_LaplaceActionPerformed
-        filterImage(0, Picture);
-    }//GEN-LAST:event_Menu_Filter_LaplaceActionPerformed
+    private void Menu_Border_LaplaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Border_LaplaceActionPerformed
+        drawBorders(0, Picture);
+    }//GEN-LAST:event_Menu_Border_LaplaceActionPerformed
 
-    private void Menu_Filter_PrewittActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_PrewittActionPerformed
-        filterImage(1, Picture);
-    }//GEN-LAST:event_Menu_Filter_PrewittActionPerformed
+    private void Menu_Border_PrewittActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Border_PrewittActionPerformed
+        drawBorders(1, Picture);
+    }//GEN-LAST:event_Menu_Border_PrewittActionPerformed
 
-    private void Menu_Filter_RobertsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_RobertsActionPerformed
-        filterImage(2, Picture);
-    }//GEN-LAST:event_Menu_Filter_RobertsActionPerformed
+    private void Menu_Border_RobertsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Border_RobertsActionPerformed
+        drawBorders(2, Picture);
+    }//GEN-LAST:event_Menu_Border_RobertsActionPerformed
 
-    private void Menu_Filter_SobelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Filter_SobelActionPerformed
-        filterImage(3, Picture);
-    }//GEN-LAST:event_Menu_Filter_SobelActionPerformed
+    private void Menu_Border_SobelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Menu_Border_SobelActionPerformed
+        drawBorders(3, Picture);
+    }//GEN-LAST:event_Menu_Border_SobelActionPerformed
 
     public static void main(String args[])
     {
@@ -855,28 +856,24 @@ public class Pexels extends javax.swing.JFrame
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar Menu;
+    private javax.swing.JMenuItem Menu_Border_Laplace;
+    private javax.swing.JMenuItem Menu_Border_Prewitt;
+    private javax.swing.JMenuItem Menu_Border_Roberts;
+    private javax.swing.JMenuItem Menu_Border_Sobel;
+    private javax.swing.JMenu Menu_Borders;
     private javax.swing.JMenu Menu_File;
     private javax.swing.JMenuItem Menu_File_Open;
     private javax.swing.JMenuItem Menu_File_Reset;
     private javax.swing.JMenuItem Menu_File_Save;
     private javax.swing.JMenuItem Menu_File_SaveAs;
-    private javax.swing.JMenuItem Menu_Filter_Laplace;
-    private javax.swing.JMenuItem Menu_Filter_Prewitt;
-    private javax.swing.JMenuItem Menu_Filter_Roberts;
-    private javax.swing.JMenuItem Menu_Filter_Sobel;
+    private javax.swing.JMenuItem Menu_Filter_BlackNWhite;
+    private javax.swing.JMenuItem Menu_Filter_Darken;
+    private javax.swing.JMenuItem Menu_Filter_Grays;
+    private javax.swing.JMenuItem Menu_Filter_Lighten;
+    private javax.swing.JMenuItem Menu_Filter_Negative;
     private javax.swing.JMenu Menu_Filters;
-    private javax.swing.JMenuItem Menu_Operator_BlackNWhite;
-    private javax.swing.JMenuItem Menu_Operator_Darken;
-    private javax.swing.JMenuItem Menu_Operator_Greys;
-    private javax.swing.JMenuItem Menu_Operator_Lighten;
-    private javax.swing.JMenuItem Menu_Operator_Negative;
-    private javax.swing.JMenu Menu_Operators;
     private javax.swing.JLabel Picture;
     // End of variables declaration//GEN-END:variables
-
-    private String getExtensionForFilter(javax.swing.filechooser.FileFilter fileFilter) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     private int getGrayScale(int rgb)
     {
